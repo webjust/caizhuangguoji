@@ -1,0 +1,110 @@
+<div class="layui-row">
+    <div class="layui-col-md12">
+        <span class="layui-breadcrumb">
+            <a href="/">首页</a>
+            <a href="/">商品管理</a>
+            <a><cite>属性维护</cite></a>
+        </span>
+    </div>
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend>产品属性维护</legend>
+    </fieldset>
+    <div class="layui-col-md12">
+        <form class="layui-form" action="{:U('Goods/lists')}" method="get">
+            <div class="layui-inline">
+                <label class="layui-form-label">关键字</label>
+                <div class="layui-input-block">
+                    <input type="text" name="keywords" placeholder="输入商品名称或者gid" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" type="submit">搜索</button>
+            </div>
+        </form>
+    </div>
+    <div class="layui-col-md12">
+        <form id="list_form">
+        <table class="layui-table">
+            <thead>
+            <tr style="background-color: white">
+                <td colspan="5">{$page}</td>
+                <td colspan="99" style="text-align: right"><button type="button" class="layui-btn" id="button_save_list">批量保存</button></td>
+            </tr>
+            <tr>
+                <th>商品GID</th>
+                <th>图片</th>
+                <th>商品名称</th>
+                <th>重量</th>
+                <th>品牌</th>
+                <th>规格单位</th>
+                <th>规格值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name="list" id="vo">
+                <tr>
+                    <td>{$vo['g_id']}</td>
+                    <td style="text-align: center"><img src="{:replace_img_path($vo['g_picture'])}" width="200" alt=""></td>
+                    <td>{$vo['g_name']}</td>
+                    <td><input type="text" value="{$vo['g_weight']}" class="layui-input min-input" name="weight[{$vo.g_id}]"></td>
+                    <td>{$vo['gb_name']}</td>
+                    <td><input type="text" value="{$vo['g_unit']}" class="layui-input min-input" name="g_unit[{$vo.g_id}]"></td>
+                    <td><input type="text" value="{$vo['g_value']}" class="layui-input min-input" name="g_value[{$vo.g_id}]"></td>
+                </tr>
+            </volist>
+            </tbody>
+            <tfoot>
+            <tr style="text-align: center">
+                <td colspan="99">{$page}</td>
+            </tr>
+            </tfoot>
+        </table>
+        </form>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md6"></div>
+        <div class="layui-col-md6" style="text-align: right"></div>
+    </div>
+</div>
+
+<script>
+    var SCOPE = {
+        'list_save' : "{:U('Goods/list_save')}",
+    };
+
+    layui.use('layer', function() {
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+
+        // 批量保存
+        $("#button_save_list").click(function () {
+            var data = $("#list_form").serializeArray();
+            var postData = {};
+            $(data).each(function (i) {
+                postData[this.name] = this.value;
+            });
+            console.log(postData);
+            var url = SCOPE.list_save;
+
+            $.post(url, postData, function (result) {
+                console.log(result);
+                if (result.status == 1) {
+                    layer.open({
+                        content: result.info,
+                        yes: function(){
+                            window.location.href = result.data.url;
+                        }
+                    });
+                    return false;
+                } else {
+                    layer.open({
+                        content: result.info,
+                        yes: function(){
+                            window.location.href = result.data.url;
+                        }
+                    });
+                    return false;
+                }
+            }, "JSON");
+        });
+    });
+</script>
